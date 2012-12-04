@@ -46,21 +46,5 @@ public class ListeMots extends Liste<Mots> {
 		}
 			
 	}
-
-	public ListeMots ajouterLeMotTrie(Mots mot) {
-				
-		if (mot.getDistanceLenvenshtein() > tete().getDistanceLenvenshtein()){
-			return new ListeMots(mot, this);
-		}	
-		else {
-			if (queue() == null){
-				setQueue(new ListeMots(mot, null));
-				return this;
-			}
-			else{
-				return ((ListeMots) queue()).ajouterLeMotTrie(mot);
-			}
-		}
-	}//ajouterLeMotTrie()
-
+	
 }

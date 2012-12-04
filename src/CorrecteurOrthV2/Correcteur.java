@@ -26,6 +26,7 @@ public class Correcteur {
 		while (scan.hasNext())// tant qu'il y'a une chaine de caractère à lire
 		{
 			String chaine = scan.next();
+			chaine = chaine.toLowerCase();
 			tableDeMot.ajouter(new Mots(chaine));// ajout du mot dans la table des mots
 			Mots leMot = new Mots(chaine);
 			chaine = "$"+chaine+"$";
@@ -61,7 +62,8 @@ public class Correcteur {
 	static void corrigerUnMot(String motACorriger) throws IOException{
 		
 		 contruireTables(); // construction des tables 
-		 String chaine = "$"+motACorriger+"$";
+		 
+		 String chaine = "$"+motACorriger.toLowerCase()+"$";
 		 ListeMots listeMotsCandidat = null;
 		 
 		// parcourt mot et création des tri-gramme 
@@ -78,9 +80,13 @@ public class Correcteur {
 				leMot.incrementer();
 				
 				if ((leMot.getNbApparition() == 3) && (Jaccard.indiceJaccard(leMot.getNom(), motACorriger)> 0.2) && listeMotsCandidat == null){
+					// On et ajour la distance de leveinshtein
+					leMot.setDistanceLenvenshtein(Levenshtein.d(leMot.getNom(), motACorriger));
 					listeMotsCandidat = new ListeMots(leMot, null);
 				}
 				else if ((leMot.getNbApparition() == 3) && (Jaccard.indiceJaccard(leMot.getNom(), motACorriger)> 0.2)){
+					// On et ajour la distance de leveinshtein
+					leMot.setDistanceLenvenshtein(Levenshtein.d(leMot.getNom(), motACorriger));
 					listeMotsCandidat = listeMotsCandidat.ajouterEnTete(leMot);
 				}
 				
@@ -90,33 +96,17 @@ public class Correcteur {
 			
 		 }// fin de recherche des mots pour tous les tri-gramme 
 		 
-		
-		 //pacourt de la liste pour la trie avec levenshtein
-		 ListeMots listeMotsFinal = null;
-		 while (listeMotsCandidat != null){
-			 
-			 Mots leMot = listeMotsCandidat.tete();
-			 leMot.setDistanceLenvenshtein(Levenshtein.d(leMot.getNom(), motACorriger));
-			 
-			 if (listeMotsFinal == null){
-				 listeMotsFinal = new ListeMots(leMot, null);
-			}
-			else {
-				listeMotsFinal = listeMotsFinal.ajouterLeMotTrie(leMot);
-			}
-				
-			 listeMotsCandidat = (ListeMots) listeMotsCandidat.queue();
-		 }
-		 listeMotsFinal.affiche();
-		 
-//		 listeMotsCandidat.affiche();
+	
+		 //On trie la liste
+		 listeMotsCandidat =  QuickSortListe.quick_sort(listeMotsCandidat);
+		 listeMotsCandidat.affiche();
 	}//corrigerUnMot()
 	
 	//	/*
 //	*/
 	public static void main(String[] args) throws IOException{
 //		Correcteur.contruireTables();
-		Correcteur.corrigerUnMot("ordinatur");
+		Correcteur.corrigerUnMot("OrdinAteur");
 		
 //		Double d = Levenshtein.d("odrinateur", "ordinatur");
 //		System.out.println(d);
