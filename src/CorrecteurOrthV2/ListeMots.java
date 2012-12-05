@@ -1,7 +1,7 @@
 package CorrecteurOrthV2;
 
 public class ListeMots extends Liste<Mots> {
-
+	
 	public ListeMots(Mots contenu, ListeMots suivant) {
 		super(contenu, suivant);
 	}
@@ -18,10 +18,10 @@ public class ListeMots extends Liste<Mots> {
 		if (tete().getNom().equals(x))
 			return true;
 		else {
-			if (this.queue() != null && this.queue().estDans(x))
-				return true;
+			if (this.queue() != null)
+				return this.queue().estDans(x);
 		}	
-				
+		
 		return false;
 	}
 
@@ -32,7 +32,7 @@ public class ListeMots extends Liste<Mots> {
 			this.queue().affiche();
 		}
 		else {
-			System.out.println("["+tete().getNom()+"]");
+			System.out.println("["+tete().getNom()+"] ("+tete().getDistanceLenvenshtein()+")");
 		}	
 		
 	}
@@ -46,5 +46,49 @@ public class ListeMots extends Liste<Mots> {
 		}
 			
 	}
+
+	static public String getListeEnString(ListeMots l, int nbCandidat) {
+		
+		int i = 0;
+		String chaine = "";
+		while (l != null && ++i <= nbCandidat){
+			if (i < nbCandidat)
+				chaine += l.tete().getNom()+", ";
+			else 
+				chaine += l.tete().getNom();
+			
+			l = (ListeMots) l.queue();
+		}
+		return chaine;
+	}
+
+	public static ListeMots couper(ListeMots listeMotsCandidat, int nbCandidat) {
 	
+		int i = 0;
+		ListeMots l = null;
+		while (listeMotsCandidat != null && ++i <= nbCandidat){
+			
+			if( l == null){
+				l = new ListeMots(listeMotsCandidat.tete(), null);
+			}	
+			else {
+				l.ajouterEnFinListe(listeMotsCandidat.tete());
+			}
+			
+//			l.affiche();
+			listeMotsCandidat = (ListeMots) listeMotsCandidat.queue();
+		}
+		return l;
+	}
+
+	public void ajouterEnFinListe(Mots m) {
+		
+		if (this.queue() == null){
+			this.setQueue(new ListeMots(m, null));
+		}	
+		else{
+			((ListeMots) this.queue()).ajouterEnFinListe(m);
+		}
+			
+	}//	ajouterEnFinListe()
 }

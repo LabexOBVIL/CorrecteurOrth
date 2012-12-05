@@ -9,7 +9,10 @@ public class TableTriGramme extends Table<TriGramme> {
 	
 	public TriGramme getTriGramme(String nomTriGramme){
 		int indice = hashCode(nomTriGramme);
-		return ((ListeTriGramme) tableau[indice]).getTriGramme(nomTriGramme);
+		if (tableau[indice] == null)
+			return null;
+		else
+			return ((ListeTriGramme) tableau[indice]).getTriGramme(nomTriGramme);
 		
 	}
 	
