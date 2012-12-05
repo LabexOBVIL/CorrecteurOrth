@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Calendar;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -69,6 +70,7 @@ public class Correcteur {
 		 String chaine = "$"+motACorriger.toLowerCase()+"$";
 		 
 		 ListeMots listeMotsCandidat = null;
+		 TriGramme[] TabTrigramme = new TriGramme[chaine.length()-2]; // tableau permetant de sotcké l'objet Trigramme
 		 
 		// parcourt mot et création des tri-gramme 
 		 for (int j = 0; j < chaine.length()-2; j++) {
@@ -76,7 +78,8 @@ public class Correcteur {
 			
 			 //On récupère le tri_grame dans la tables hashing code "tableTriGramme"
 			 TriGramme tri_gramme = tableTriGramme.getTriGramme(nomTri_gramme); 
-			
+			 TabTrigramme[j] = tri_gramme;// On stock le Trigramme afin de remette a zero le nombre d'appartion de tous les Mots par la suite 
+			 
 			 ListeMots listeMotsContentLeTri = null;// on declare une lise pour récupére les mots contenant le tri-gramme
 			 //On vérifie que le tri_gramme existe bien
 			 if (tri_gramme != null){
@@ -113,27 +116,23 @@ public class Correcteur {
 		 }
 		 
 		 //On remet a zero le nombre d'appartition de tous les mots contenant les tri-gramme
-		 for (int j = 0; j < chaine.length()-2; j++) {
-			 String nomTri_gramme = (chaine.substring(j, j+3));
+		 ListeMots listeMotsContentLeTri = null;
+		 for (int i = 0; i < TabTrigramme.length; i++) {
 			
-			 //On récupère le tri_grame dans la tables hashing code "tableTriGramme"
-			 TriGramme tri_gramme = tableTriGramme.getTriGramme(nomTri_gramme); 
+			 if (TabTrigramme[i] != null){
+				 listeMotsContentLeTri = TabTrigramme[i].getListeMots();
+			 }
 			
-			 ListeMots listeMotsContentLeTri = null;// on declare une lise pour récupére les mots contenant le tri-gramme
-			 //On vérifie que le tri_gramme existe bien
-			 if (tri_gramme != null){
-				 listeMotsContentLeTri = tri_gramme.getListeMots();
-			 }	 
-			 
-			while (listeMotsContentLeTri != null){
-				Mots leMot = listeMotsContentLeTri.tete();
-				leMot.setNbApparition(0);
-				listeMotsContentLeTri = (ListeMots) listeMotsContentLeTri.queue();
+			 while (listeMotsContentLeTri != null){
+					Mots leMot = listeMotsContentLeTri.tete();
+					leMot.setNbApparition(0);
+					listeMotsContentLeTri = (ListeMots) listeMotsContentLeTri.queue();
 			}	
-		 }//fin de recherche des mots pour tous les tri-gramme 
-		 
 		
-		 listeMotsCandidat = ListeMots.couper(listeMotsCandidat, 10);
+		 }//fin de mise a jour de tous les tri-grames 
+		 
+	
+		 listeMotsCandidat = ListeMots.couper(listeMotsCandidat, 10);// On récupere les 10 premiers candidats
 		 return listeMotsCandidat;
 		 
 	}//corrigerUnMot()
@@ -141,13 +140,18 @@ public class Correcteur {
 
 	public static void CoorigerUnText(FileReader fichierACorriger) throws IOException{
 		
+		Double tempsDep = (double) System.currentTimeMillis ();
 		contruireTables(); // construction des tables
+		Double tempFin = (double) System.currentTimeMillis();
 		
+		System.out.println("Construction des tables fini : "+ ( tempFin- tempsDep)/1000);
 		Scanner scan = new Scanner(fichierACorriger);// lecture du fichier a corriger
 		
 		int nbMotNonCorrige = 0;
 		int nbMotCorrectionPropose = 0;
 		int nbMotCorrige = 0;
+		
+		Double tempsDepCorrectionFichier = (double) System.currentTimeMillis ();
 		
 		while (scan.hasNextLine())// tant qu'il y'a une chaine de caractère à lire
 		{
@@ -156,8 +160,9 @@ public class Correcteur {
 			String motACorriger = motLine[0];
 //			System.out.println(motACorriger);
 			ListeMots l = null;
-			
 			String bonneCorrection = motLine[1].toLowerCase();
+			
+			tempsDep = (double) System.currentTimeMillis (); // temps début correction mot
 			if (!tableDeMot.isContent(motACorriger)){
 
 				l = corrigerUnMot(motACorriger);
@@ -177,13 +182,18 @@ public class Correcteur {
 				}	
 				else{
 					nbMotNonCorrige ++;
-				}	
-			}
+				}
+			}// fin correction
+			tempFin = (double) System.currentTimeMillis();
+			System.out.println(motACorriger+" : " + (tempFin - tempsDep)/1000);
 		}
+		Double tempsFinCorrectionFichier = (double) System.currentTimeMillis ();
 		
 		System.out.println(nbMotCorrige+ " bonnes corrections");
 		System.out.println("Nombre de mot correction propose : "+ nbMotCorrectionPropose);
 		System.out.println("Nombre de mot non corrige : "+ nbMotNonCorrige);
+		
+		System.out.println("temps pour corriger les 269 mots : "+ (tempsFinCorrectionFichier - tempsDepCorrectionFichier)/1000 );
 	
 	}
 }
