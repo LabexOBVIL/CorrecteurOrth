@@ -30,6 +30,10 @@ public class Mots {
 		return nbApparition;
 	}
 	
+	public void setNbApparition(int nbApparition) {
+		this.nbApparition = nbApparition;
+	}
+
 	public boolean egal(String str){
 		if (str.equals(nom))
 			return true;

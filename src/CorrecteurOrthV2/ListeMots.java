@@ -47,20 +47,6 @@ public class ListeMots extends Liste<Mots> {
 			
 	}
 
-	static public String getListeEnString(ListeMots l, int nbCandidat) {
-		
-		int i = 0;
-		String chaine = "";
-		while (l != null && ++i <= nbCandidat){
-			if (i < nbCandidat)
-				chaine += l.tete().getNom()+", ";
-			else 
-				chaine += l.tete().getNom();
-			
-			l = (ListeMots) l.queue();
-		}
-		return chaine;
-	}
 
 	public static ListeMots couper(ListeMots listeMotsCandidat, int nbCandidat) {
 	

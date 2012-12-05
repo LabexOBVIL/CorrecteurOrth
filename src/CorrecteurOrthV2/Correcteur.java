@@ -66,10 +66,8 @@ public class Correcteur {
 	
 	static ListeMots corrigerUnMot(String motACorriger) throws IOException{
 		
-//		System.out.println(motACorriger);
-		contruireTables(); // construction des tables
 		 String chaine = "$"+motACorriger.toLowerCase()+"$";
-//		 System.out.println(chaine);
+		 
 		 ListeMots listeMotsCandidat = null;
 		 
 		// parcourt mot et création des tri-gramme 
@@ -79,18 +77,15 @@ public class Correcteur {
 			 //On récupère le tri_grame dans la tables hashing code "tableTriGramme"
 			 TriGramme tri_gramme = tableTriGramme.getTriGramme(nomTri_gramme); 
 			
-			 ListeMots listeMotsContentLeTri = null;// on declare une lise pourrécupére les mots contenant le tri-gramme
+			 ListeMots listeMotsContentLeTri = null;// on declare une lise pour récupére les mots contenant le tri-gramme
 			 //On vérifie que le tri_gramme existe bien
 			 if (tri_gramme != null){
 				 listeMotsContentLeTri = tri_gramme.getListeMots();
 			 }	 
-			 else{
-//				 System.out.println("le Trigramme nesxite pas : "+nomTri_gramme);
-			 }
+			 
 			while (listeMotsContentLeTri != null){
-			
+				
 				Mots leMot = listeMotsContentLeTri.tete();
-//				System.out.println(leMot.getNom());
 				// On incrimente nombre d'appraition du mot 
 				leMot.incrementer();
 				
@@ -116,14 +111,35 @@ public class Correcteur {
 		 if (listeMotsCandidat != null){
 			 listeMotsCandidat =  QuickSortListe.quick_sort(listeMotsCandidat);
 		 }
+		 
+		 //On remet a zero le nombre d'appartition de tous les mots contenant les tri-gramme
+		 for (int j = 0; j < chaine.length()-2; j++) {
+			 String nomTri_gramme = (chaine.substring(j, j+3));
+			
+			 //On récupère le tri_grame dans la tables hashing code "tableTriGramme"
+			 TriGramme tri_gramme = tableTriGramme.getTriGramme(nomTri_gramme); 
+			
+			 ListeMots listeMotsContentLeTri = null;// on declare une lise pour récupére les mots contenant le tri-gramme
+			 //On vérifie que le tri_gramme existe bien
+			 if (tri_gramme != null){
+				 listeMotsContentLeTri = tri_gramme.getListeMots();
+			 }	 
+			 
+			while (listeMotsContentLeTri != null){
+				Mots leMot = listeMotsContentLeTri.tete();
+				leMot.setNbApparition(0);
+				listeMotsContentLeTri = (ListeMots) listeMotsContentLeTri.queue();
+			}	
+		 }//fin de recherche des mots pour tous les tri-gramme 
+		 
 		
-//		 listeMotsCandidat.affiche();
-		 listeMotsCandidat = ListeMots.couper(listeMotsCandidat, 20);
+		 listeMotsCandidat = ListeMots.couper(listeMotsCandidat, 10);
 		 return listeMotsCandidat;
+		 
 	}//corrigerUnMot()
 	
 
-	public static void CoorigerUnText(FileReader fichierACorriger) throws IOException, InterruptedException{
+	public static void CoorigerUnText(FileReader fichierACorriger) throws IOException{
 		
 		contruireTables(); // construction des tables
 		
@@ -136,36 +152,30 @@ public class Correcteur {
 		while (scan.hasNextLine())// tant qu'il y'a une chaine de caractère à lire
 		{
 			String[] motLine = scan.nextLine().split(" ⇒ ");
+			
 			String motACorriger = motLine[0];
 //			System.out.println(motACorriger);
 			ListeMots l = null;
 			
 			String bonneCorrection = motLine[1].toLowerCase();
-//			System.out.println(bonneCorrection);
-			
 			if (!tableDeMot.isContent(motACorriger)){
 
 				l = corrigerUnMot(motACorriger);
 				if (l != null){
-					System.out.println("Le mot a corrige : "+motACorriger+ " Le mot trouve : "+l.tete().getNom()+ " Le mot correct : "+ bonneCorrection);
-					
-					if (l.tete().getNom().equals(bonneCorrection)){ // Si le premiere correction est la bonne 
+//					System.out.println("Le mot a corrige : "+motACorriger+ " Le mot trouve : "+l.tete().getNom()+ " Le mot correct : "+ bonneCorrection);
+					 // Si le premiere correction est la bonne
+					if (l.tete().getNom().equals(bonneCorrection)){ 
 						nbMotCorrige ++;
 					}	
-					else{// Si non on ecris dans le fichier les proposition de correction pour le fichier
-//						l.affiche();
-						 if (l.estDans(bonneCorrection)){
-							 nbMotCorrectionPropose++;
-							 nbMotCorrige ++;
-						 }
-						 else {
-//							 System.out.println(motACorriger);
+					// Si non on ecris dans le fichier les proposition de correction pour le fichier
+					 if (l.estDans(bonneCorrection))
+						nbMotCorrectionPropose++;
+					 
+					 else 
 							 nbMotNonCorrige ++;
-						 }	 
-					}	
-				}
+						 
+				}	
 				else{
-					
 					nbMotNonCorrige ++;
 				}	
 			}
@@ -175,17 +185,5 @@ public class Correcteur {
 		System.out.println("Nombre de mot correction propose : "+ nbMotCorrectionPropose);
 		System.out.println("Nombre de mot non corrige : "+ nbMotNonCorrige);
 	
-	}
-	public static void main(String[] args) throws IOException, InterruptedException{
-//		Correcteur.contruireTables();
-	Correcteur.CoorigerUnText(new FileReader("C:/Users/bouabd/workspace/CorrecteurOrth/materiel/fautes2012.txt"));
-	
-		
-		contruireTables();
-		Correcteur.corrigerUnMot("waggon").affiche();
-	
-		
-//		Double d = Levenshtein.d("odrinateur", "ordinatur");
-//		System.out.println(d);
 	}
 }
