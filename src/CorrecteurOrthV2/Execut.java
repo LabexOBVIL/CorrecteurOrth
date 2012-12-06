@@ -14,7 +14,10 @@ import java.util.Vector;
 public class Execut {
 
 	public static void main(String[] args) throws IOException {
-		Correcteur.CoorigerUnText(new FileReader("C:/Users/bouabd/workspace/CorrecteurOrth/materiel/fautes2012.txt"));
+		//Correction des mot 
+		Correcteur.CoorigerUnText(new FileReader("materiel/fautes2012.txt"));
+//		Correcteur.corrigerUnMot("dance").affiche();
+		
 	}//main()
 			
 	

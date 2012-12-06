@@ -7,6 +7,7 @@ public class TableTriGramme extends Table<TriGramme> {
 		tableau = new ListeTriGramme [nEntree];
 	}
 	
+	// Recupere un TriGramme dans la ListeTrigramme contenu dans la table 
 	public TriGramme getTriGramme(String nomTriGramme){
 		int indice = hashCode(nomTriGramme);
 		if (tableau[indice] == null)
@@ -17,7 +18,6 @@ public class TableTriGramme extends Table<TriGramme> {
 	}
 	
 	// ajouter un element dans le tableau 
-	
 	public void ajouter (TriGramme trigramme){
 		
 		int indice = hashCode(trigramme.getNom());

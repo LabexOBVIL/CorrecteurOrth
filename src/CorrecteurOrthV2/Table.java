@@ -20,13 +20,10 @@ public abstract class Table<T> {
 	
 	public boolean isContent(String nom){
 		int indice = hashCode(nom);
-//		System.out.println(indice);
 		if (tableau[indice] != null){
-//			System.out.println("existe");
 			return tableau[indice].estDans(nom);
 		}
 		else {
-//			System.out.println("n'existe pas ");
 			return false;
 		}
 			
